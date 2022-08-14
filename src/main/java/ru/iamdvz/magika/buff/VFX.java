@@ -72,7 +72,7 @@ public class VFX extends BuffSpell {
                 playerLocation.getX() + relativeOffset.getX()*Math.cos((playerLocation.getYaw()+90) * toRadian) + relativeOffset.getZ()*Math.cos(playerLocation.getYaw() * toRadian),
                 playerLocation.getY() + relativeOffset.getY(),
                 playerLocation.getZ() + relativeOffset.getX()*Math.sin((playerLocation.getYaw()+90) * toRadian) + relativeOffset.getZ()*Math.sin(playerLocation.getYaw() * toRadian));
-        armorStandLocation.setYaw((float) (playerLocation.getYaw()+headRotation.getX()));
+        armorStandLocation.setYaw((float) (playerLocation.getYaw()+headRotation.getY()));
 
         playSpellEffects(EffectPosition.TARGET, armorStandLocation);
         ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
