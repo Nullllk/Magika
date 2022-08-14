@@ -67,7 +67,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
                 target.getX() + relativeOffset.getX()*Math.cos((target.getYaw()+90) * toRadian) + relativeOffset.getZ()*Math.cos(target.getYaw() * toRadian),
                 target.getY() + relativeOffset.getY(),
                 target.getZ() + relativeOffset.getX()*Math.sin((target.getYaw()+90) * toRadian) + relativeOffset.getZ()*Math.sin(target.getYaw() * toRadian));
-        armorStandLocation.setYaw((float) (target.getYaw()+headRotation.getX()));
+        armorStandLocation.setYaw((float) (target.getYaw()+headRotation.getY()));
 
         playSpellEffects(EffectPosition.TARGET, armorStandLocation);
         ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
