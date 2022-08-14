@@ -1,0 +1,4 @@
+#You need that item for no lag on first frame with item rotation
+
+blank-item-type: FEATHER
+blank-item-custom-model-data: 1
