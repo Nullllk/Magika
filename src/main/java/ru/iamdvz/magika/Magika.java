@@ -1,4 +1,4 @@
-package ru.iamdvz.magicaddon;
+package ru.iamdvz.magika;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;

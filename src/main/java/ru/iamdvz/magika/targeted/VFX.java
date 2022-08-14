@@ -1,4 +1,4 @@
-package ru.iamdvz.magicaddon.targeted;
+package ru.iamdvz.magika.targeted;
 
 import com.nisovin.magicspells.MagicSpells;
 import com.nisovin.magicspells.spelleffects.EffectPosition;
@@ -15,7 +15,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
-import ru.iamdvz.magicaddon.utils.colorUtil;
+import ru.iamdvz.magika.utils.colorUtil;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

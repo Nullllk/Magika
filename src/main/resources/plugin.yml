@@ -1,5 +1,5 @@
 name: MagicAddon
-main: ru.iamdvz.magicaddon.MagicAddon
+main: ru.iamdvz.magika.Magika
 version: '${version}'
 api-version: "1.18"
 authors: [iamDvz]

@@ -1,4 +1,4 @@
-package ru.iamdvz.magicaddon.utils;
+package ru.iamdvz.magika.utils;
 
 import org.bukkit.Color;
 
