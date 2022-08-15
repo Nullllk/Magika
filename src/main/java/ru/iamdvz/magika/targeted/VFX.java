@@ -93,25 +93,25 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         blankItemIS.setItemMeta(headItemM);
         armorStand.setItem(EquipmentSlot.HEAD, blankItemIS);
 
-        AtomicInteger duration = new AtomicInteger(0);
+        final int[] duration = {0};
         int orientWhenTeleportToCasterInt = orientWhenTeleportToCaster ? 1 : 0;
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (itemList != null && duration.get() < itemList.size()) {
-                    armorStand.getItem(EquipmentSlot.HEAD).setType(Material.valueOf(itemList.get(duration.get()).split(":")[0].toUpperCase()));
+                if (itemList != null && duration[0] < itemList.size()) {
+                    armorStand.getItem(EquipmentSlot.HEAD).setType(Material.valueOf(itemList.get(duration[0]).split(":")[0].toUpperCase()));
                     if (armorStand.getItem(EquipmentSlot.HEAD).getType() == Material.POTION) {
-                        headItemPM.setColor(colorUtil.hexToRGBColor(itemList.get(duration.get()).split(",")[1].split(":")[1]));
-                        headItemPM.setCustomModelData(Integer.parseInt(itemList.get(duration.get()).split(":")[1].split(",")[0]));
+                        headItemPM.setColor(colorUtil.hexToRGBColor(itemList.get(duration[0]).split(",")[1].split(":")[1]));
+                        headItemPM.setCustomModelData(Integer.parseInt(itemList.get(duration[0]).split(":")[1].split(",")[0]));
                         armorStand.getItem(EquipmentSlot.HEAD).setItemMeta(headItemPM);
                     }
                     else {
-                        headItemM.setCustomModelData(Integer.valueOf(itemList.get(duration.get()).split(":")[1].split(",")[0]));
+                        headItemM.setCustomModelData(Integer.valueOf(itemList.get(duration[0]).split(":")[1].split(",")[0]));
                         armorStand.getItem(EquipmentSlot.HEAD).setItemMeta(headItemM);
                     }
                 }
                 else {
-                    if (duration.get() >= maxDuration){
+                    if (duration[0] >= maxDuration){
                         armorStand.remove();
                         this.cancel();
                     }
@@ -122,7 +122,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
                             relativeOffset.getY(),
                             relativeOffset.getX()*Math.sin(((target.getYaw()-target.getYaw()*orientWhenTeleportToCasterInt)+90 + orientWhenTeleportToCasterInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.sin(((target.getYaw()-target.getYaw()*orientWhenTeleportToCasterInt) + orientWhenTeleportToCasterInt*player.getLocation().getYaw()) * toRadian)));
                 }
-                duration.addAndGet(1);
+                duration[0]++;
             }
 
             }.runTaskTimer(MagicSpells.getInstance(), 2, 1);
