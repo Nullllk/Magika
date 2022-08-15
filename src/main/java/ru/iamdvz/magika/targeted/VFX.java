@@ -74,11 +74,9 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + headRotation.getX()*(toRadian),
                                                  armorStand.getHeadPose().getY(),
                                               armorStand.getHeadPose().getZ() + headRotation.getZ()*(toRadian)));
-        armorStand.setArms(false);
         armorStand.setSilent(true);
-        armorStand.setVisible(true);
+        armorStand.setVisible(false);
         armorStand.setGravity(false);
-        armorStand.setBasePlate(false);
         armorStand.setCollidable(false);
         armorStand.setInvulnerable(true);
         armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);

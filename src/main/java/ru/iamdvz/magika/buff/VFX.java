@@ -79,11 +79,9 @@ public class VFX extends BuffSpell {
         armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + headRotation.getX()*(toRadian),
                                                  armorStand.getHeadPose().getY(),
                                               armorStand.getHeadPose().getZ() + headRotation.getZ()*(toRadian)));
-        armorStand.setArms(false);
         armorStand.setSilent(true);
-        armorStand.setVisible(true);
+        armorStand.setVisible(false);
         armorStand.setGravity(false);
-        armorStand.setBasePlate(false);
         armorStand.setCollidable(false);
         armorStand.setInvulnerable(true);
         armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
@@ -124,6 +122,9 @@ public class VFX extends BuffSpell {
                         relativeOffset.getY(),
                         relativeOffset.getX()*Math.sin(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.sin(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()) * toRadian)));
                 duration[0]++;
+                if (duration[0] > itemList.size()){
+                    duration[0] = 0;
+                }
             }
             }.runTaskTimer(MagicSpells.getInstance(), 2, 1);
         return true;
