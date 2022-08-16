@@ -26,23 +26,27 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
     private int maxDuration;
     private List<String> itemList;
     private Vector relativeOffset;
-    private boolean teleportToCaster;
-    private boolean orientWhenTeleportToCaster;
 
     public VFX(MagicConfig config, String spellName) {
         super(config, spellName);
         itemList = getConfigStringList("items-list", null);
         headRotation = getConfigVector("head-rotation", "0,0,0");
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
-        teleportToCaster = getConfigBoolean("teleport-to-caster", false);
-        orientWhenTeleportToCaster = getConfigBoolean("orient-when-teleport", false);
         maxDuration = getConfigInt("max-duration", itemList.size());
 
         for (String item : itemList){
             ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
-            ItemMeta itemTempM = itemTemp.getItemMeta();
-            itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
-            itemTemp.setItemMeta(itemTempM);
+            if (itemTemp.getType() == Material.POTION) {
+                PotionMeta itemTempM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
+                itemTempM.setColor(colorUtil.hexToRGBColor(item.split(",")[1].split(":")[1]));
+                itemTempM.setCustomModelData(Integer.parseInt(item.split(":")[1].split(",")[0]));
+                itemTemp.setItemMeta(itemTempM);
+            }
+            else {
+                ItemMeta itemTempM = itemTemp.getItemMeta();
+                itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
+                itemTemp.setItemMeta(itemTempM);
+            }
             itemListIS.add(itemTemp);
         }
         itemList = null;
@@ -51,9 +55,6 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
     @Override
     public PostCastAction castSpell(LivingEntity caster, SpellCastState state, float power, String[] args) {
         playSpellEffects(EffectPosition.CASTER, caster);
-        if (teleportToCaster){
-            armorstandSpawn(caster.getLocation(), (Player) caster);
-        }
         return PostCastAction.HANDLE_NORMALLY;
     }
 
@@ -90,10 +91,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
         armorStand.addScoreboardTag("MS_ARMOR_STAND");
 
-        //PotionMeta headItemPM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
-
         final int[] duration = {0};
-        int orientWhenTeleportToCasterInt = orientWhenTeleportToCaster ? 1 : 0;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -105,12 +103,6 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
                         armorStand.remove();
                         this.cancel();
                     }
-                }
-                if (teleportToCaster) {
-                    armorStand.teleport(player.getLocation().add(
-                            relativeOffset.getX()*Math.cos(((target.getYaw()-target.getYaw()*orientWhenTeleportToCasterInt)+90 + orientWhenTeleportToCasterInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.cos(((target.getYaw()-target.getYaw()*orientWhenTeleportToCasterInt) + orientWhenTeleportToCasterInt*player.getLocation().getYaw()) * toRadian),
-                            relativeOffset.getY(),
-                            relativeOffset.getX()*Math.sin(((target.getYaw()-target.getYaw()*orientWhenTeleportToCasterInt)+90 + orientWhenTeleportToCasterInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.sin(((target.getYaw()-target.getYaw()*orientWhenTeleportToCasterInt) + orientWhenTeleportToCasterInt*player.getLocation().getYaw()) * toRadian)));
                 }
                 duration[0]++;
             }
