@@ -17,10 +17,11 @@ import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import ru.iamdvz.magika.utils.colorUtil;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class VFX extends TargetedSpell implements TargetedLocationSpell {
+    private List<ItemStack> itemListIS = new ArrayList<>();
     private Vector headRotation;
     private int maxDuration;
     private List<String> itemList;
@@ -35,8 +36,16 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
         teleportToCaster = getConfigBoolean("teleport-to-caster", false);
         orientWhenTeleportToCaster = getConfigBoolean("orient-when-teleport", false);
-
         maxDuration = getConfigInt("max-duration", itemList.size());
+
+        for (String item : itemList){
+            ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
+            ItemMeta itemTempM = itemTemp.getItemMeta();
+            itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
+            itemTemp.setItemMeta(itemTempM);
+            itemListIS.add(itemTemp);
+        }
+        itemList = null;
     }
 
     @Override
@@ -53,7 +62,6 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         armorstandSpawn(target, (Player) caster);
         return false;
     }
-
     // не используется в тмуспе
     @Override
     public boolean castAtLocation(Location target, float power) {
@@ -82,31 +90,15 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
         armorStand.addScoreboardTag("MS_ARMOR_STAND");
 
-        ItemMeta headItemM = new ItemStack(Material.FEATHER).getItemMeta();
-        headItemM.setCustomModelData(1);
-
-        PotionMeta headItemPM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
-
-        ItemStack blankItemIS = new ItemStack(Material.FEATHER);
-        blankItemIS.setItemMeta(headItemM);
-        armorStand.setItem(EquipmentSlot.HEAD, blankItemIS);
+        //PotionMeta headItemPM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
 
         final int[] duration = {0};
         int orientWhenTeleportToCasterInt = orientWhenTeleportToCaster ? 1 : 0;
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (itemList != null && duration[0] < itemList.size()) {
-                    armorStand.getItem(EquipmentSlot.HEAD).setType(Material.valueOf(itemList.get(duration[0]).split(":")[0].toUpperCase()));
-                    if (armorStand.getItem(EquipmentSlot.HEAD).getType() == Material.POTION) {
-                        headItemPM.setColor(colorUtil.hexToRGBColor(itemList.get(duration[0]).split(",")[1].split(":")[1]));
-                        headItemPM.setCustomModelData(Integer.parseInt(itemList.get(duration[0]).split(":")[1].split(",")[0]));
-                        armorStand.getItem(EquipmentSlot.HEAD).setItemMeta(headItemPM);
-                    }
-                    else {
-                        headItemM.setCustomModelData(Integer.valueOf(itemList.get(duration[0]).split(":")[1].split(",")[0]));
-                        armorStand.getItem(EquipmentSlot.HEAD).setItemMeta(headItemM);
-                    }
+                if (itemListIS != null && duration[0] < itemListIS.size()) {
+                    armorStand.setItem(EquipmentSlot.HEAD, itemListIS.get(duration[0]));
                 }
                 else {
                     if (duration[0] >= maxDuration){
