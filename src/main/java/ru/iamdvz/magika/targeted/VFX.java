@@ -22,6 +22,7 @@ import java.util.List;
 
 public class VFX extends TargetedSpell implements TargetedLocationSpell {
     private List<ItemStack> itemListIS = new ArrayList<>();
+    private EquipmentSlot equipmentSlot;
     private Vector headRotation;
     private int maxDuration;
     private List<String> itemList;
@@ -33,6 +34,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         headRotation = getConfigVector("head-rotation", "0,0,0");
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
         maxDuration = getConfigInt("max-duration", itemList.size());
+        equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
         for (String item : itemList){
             ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
@@ -50,6 +52,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
             itemListIS.add(itemTemp);
         }
         itemList = null;
+
     }
 
     @Override
@@ -96,7 +99,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
             @Override
             public void run() {
                 if (itemListIS != null && duration[0] < itemListIS.size()) {
-                    armorStand.setItem(EquipmentSlot.HEAD, itemListIS.get(duration[0]));
+                    armorStand.setItem(equipmentSlot, itemListIS.get(duration[0]));
                 }
                 else {
                     if (duration[0] >= maxDuration){
@@ -106,8 +109,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
                 }
                 duration[0]++;
             }
-
-            }.runTaskTimer(MagicSpells.getInstance(), 2, 1);
+        }.runTaskTimer(MagicSpells.getInstance(), 1, 1);
         return true;
     }
 }
