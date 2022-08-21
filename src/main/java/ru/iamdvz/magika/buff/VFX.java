@@ -19,13 +19,11 @@ import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import ru.iamdvz.magika.utils.colorUtil;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
 public class VFX extends BuffSpell {
+    private List<ItemStack> itemListIS = new ArrayList<>();
+    private EquipmentSlot equipmentSlot;
     private final Set<UUID> players;
     private Vector headRotation;
     private List<String> itemList;
@@ -38,8 +36,26 @@ public class VFX extends BuffSpell {
         headRotation = getConfigVector("head-rotation", "0,0,0");
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
         orientYaw = getConfigBoolean("orient-yaw", false);
+        equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
         players = new HashSet<>();
+
+        for (String item : itemList){
+            ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
+            if (itemTemp.getType() == Material.POTION) {
+                PotionMeta itemTempM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
+                itemTempM.setColor(colorUtil.hexToRGBColor(item.split(",")[1].split(":")[1]));
+                itemTempM.setCustomModelData(Integer.parseInt(item.split(":")[1].split(",")[0]));
+                itemTemp.setItemMeta(itemTempM);
+            }
+            else {
+                ItemMeta itemTempM = itemTemp.getItemMeta();
+                itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
+                itemTemp.setItemMeta(itemTempM);
+            }
+            itemListIS.add(itemTemp);
+        }
+        itemList = null;
     }
 
     @Override
@@ -87,15 +103,6 @@ public class VFX extends BuffSpell {
         armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
         armorStand.addScoreboardTag("MS_ARMOR_STAND");
 
-        ItemMeta headItemM = new ItemStack(Material.FEATHER).getItemMeta();
-        headItemM.setCustomModelData(1);
-
-        PotionMeta headItemPM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
-
-        ItemStack blankItemIS = new ItemStack(Material.FEATHER);
-        blankItemIS.setItemMeta(headItemM);
-        armorStand.setItem(EquipmentSlot.HEAD, blankItemIS);
-
         final int[] duration = {0};
         int orientYawInt = orientYaw ? 1 : 0;
         new BukkitRunnable() {
@@ -105,28 +112,19 @@ public class VFX extends BuffSpell {
                     armorStand.remove();
                     this.cancel();
                 }
-                if (itemList != null && duration[0] < itemList.size()) {
-                    armorStand.getItem(EquipmentSlot.HEAD).setType(Material.valueOf(itemList.get(duration[0]).split(":")[0].toUpperCase()));
-                    if (armorStand.getItem(EquipmentSlot.HEAD).getType() == Material.POTION) {
-                        headItemPM.setColor(colorUtil.hexToRGBColor(itemList.get(duration[0]).split(",")[1].split(":")[1]));
-                        headItemPM.setCustomModelData(Integer.parseInt(itemList.get(duration[0]).split(":")[1].split(",")[0]));
-                        armorStand.getItem(EquipmentSlot.HEAD).setItemMeta(headItemPM);
-                    }
-                    else {
-                        headItemM.setCustomModelData(Integer.valueOf(itemList.get(duration[0]).split(":")[1].split(",")[0]));
-                        armorStand.getItem(EquipmentSlot.HEAD).setItemMeta(headItemM);
-                    }
+                if (itemListIS != null && duration[0] < itemListIS.size()) {
+                    armorStand.setItem(equipmentSlot, itemListIS.get(duration[0]));
                 }
                 armorStand.teleport(player.getLocation().add(
                         relativeOffset.getX()*Math.cos(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.cos(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()) * toRadian),
                         relativeOffset.getY(),
                         relativeOffset.getX()*Math.sin(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.sin(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()) * toRadian)));
                 duration[0]++;
-                if (duration[0] > itemList.size()){
+                if (duration[0] > itemListIS.size()){
                     duration[0] = 0;
                 }
             }
-            }.runTaskTimer(MagicSpells.getInstance(), 2, 1);
+        }.runTaskTimer(MagicSpells.getInstance(), 1, 1);
         return true;
     }
 }
