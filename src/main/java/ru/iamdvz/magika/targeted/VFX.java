@@ -24,6 +24,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
     private List<ItemStack> itemListIS = new ArrayList<>();
     private EquipmentSlot equipmentSlot;
     private Vector headRotation;
+    private Vector headRotationSpeed;
     private int maxDuration;
     private List<String> itemList;
     private Vector relativeOffset;
@@ -33,6 +34,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         itemList = getConfigStringList("items-list", null);
         headRotation = getConfigVector("head-rotation", "0,0,0");
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
+        headRotationSpeed = getConfigVector("head-rotation-speed", "0,0,0");
         maxDuration = getConfigInt("max-duration", itemList.size());
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
@@ -106,6 +108,12 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
                         armorStand.remove();
                         this.cancel();
                     }
+                }
+                if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0){
+                    armorStand.setHeadPose(new EulerAngle(
+                            armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
+                            armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
+                            armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
                 }
                 duration[0]++;
             }
