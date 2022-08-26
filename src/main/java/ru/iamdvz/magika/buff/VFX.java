@@ -26,6 +26,7 @@ public class VFX extends BuffSpell {
     private EquipmentSlot equipmentSlot;
     private final Set<UUID> players;
     private Vector headRotation;
+    private Vector headRotationSpeed;
     private List<String> itemList;
     private Vector relativeOffset;
     private boolean orientYaw;
@@ -35,6 +36,7 @@ public class VFX extends BuffSpell {
         itemList = getConfigStringList("items-list", null);
         headRotation = getConfigVector("head-rotation", "0,0,0");
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
+        headRotationSpeed = getConfigVector("head-rotation-speed", "0,0,0");
         orientYaw = getConfigBoolean("orient-yaw", false);
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
@@ -119,6 +121,12 @@ public class VFX extends BuffSpell {
                         relativeOffset.getX()*Math.cos(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.cos(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()) * toRadian),
                         relativeOffset.getY(),
                         relativeOffset.getX()*Math.sin(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.sin(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()) * toRadian)));
+                if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0){
+                    armorStand.setHeadPose(new EulerAngle(
+                            armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
+                            armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
+                            armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
+                }
                 duration[0]++;
                 if (duration[0] > itemListIS.size()){
                     duration[0] = 0;
