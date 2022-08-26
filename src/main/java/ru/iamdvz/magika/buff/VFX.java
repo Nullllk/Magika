@@ -85,18 +85,17 @@ public class VFX extends BuffSpell {
 
     private boolean armorstandSpawn(Player player){
         Location playerLocation = player.getLocation();
-        double toRadian = Math.PI/180;
         Location armorStandLocation = new Location(playerLocation.getWorld(),
-                playerLocation.getX() + relativeOffset.getX()*Math.cos((playerLocation.getYaw()+90) * toRadian) + relativeOffset.getZ()*Math.cos(playerLocation.getYaw() * toRadian),
+                playerLocation.getX() + relativeOffset.getX()*Math.cos(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.cos(Math.toRadians(playerLocation.getYaw())),
                 playerLocation.getY() + relativeOffset.getY(),
-                playerLocation.getZ() + relativeOffset.getX()*Math.sin((playerLocation.getYaw()+90) * toRadian) + relativeOffset.getZ()*Math.sin(playerLocation.getYaw() * toRadian));
+                playerLocation.getZ() + relativeOffset.getX()*Math.sin(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.sin(Math.toRadians(playerLocation.getYaw())));
         armorStandLocation.setYaw((float) (playerLocation.getYaw()+headRotation.getY()));
 
         playSpellEffects(EffectPosition.TARGET, armorStandLocation);
         ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
-        armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + headRotation.getX()*(toRadian),
+        armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotation.getX()),
                                                  armorStand.getHeadPose().getY(),
-                                              armorStand.getHeadPose().getZ() + headRotation.getZ()*(toRadian)));
+                                              armorStand.getHeadPose().getZ() + Math.toRadians(headRotation.getZ())));
         armorStand.setSilent(true);
         armorStand.setVisible(false);
         armorStand.setGravity(false);
@@ -118,9 +117,9 @@ public class VFX extends BuffSpell {
                     armorStand.setItem(equipmentSlot, itemListIS.get(duration[0]));
                 }
                 armorStand.teleport(player.getLocation().add(
-                        relativeOffset.getX()*Math.cos(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.cos(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()) * toRadian),
+                        relativeOffset.getX()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw())),
                         relativeOffset.getY(),
-                        relativeOffset.getX()*Math.sin(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw()) * toRadian) + relativeOffset.getZ()*Math.sin(((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()) * toRadian)));
+                        relativeOffset.getX()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()))));
                 if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0){
                     armorStand.setHeadPose(new EulerAngle(
                             armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
