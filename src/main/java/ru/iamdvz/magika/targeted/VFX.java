@@ -76,18 +76,17 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
     }
 
     private boolean armorstandSpawn(Location target, Player player){
-        double toRadian = Math.PI/180;
         Location armorStandLocation = new Location(target.getWorld(),
-                target.getX() + relativeOffset.getX()*Math.cos((target.getYaw()+90) * toRadian) + relativeOffset.getZ()*Math.cos(target.getYaw() * toRadian),
+                target.getX() + relativeOffset.getX()*Math.cos(Math.toRadians(target.getYaw()+90)) + relativeOffset.getZ()*Math.cos(Math.toRadians(target.getYaw())),
                 target.getY() + relativeOffset.getY(),
-                target.getZ() + relativeOffset.getX()*Math.sin((target.getYaw()+90) * toRadian) + relativeOffset.getZ()*Math.sin(target.getYaw() * toRadian));
+                target.getZ() + relativeOffset.getX()*Math.sin(Math.toRadians(target.getYaw()+90)) + relativeOffset.getZ()*Math.sin(Math.toRadians(target.getYaw())));
         armorStandLocation.setYaw((float) (target.getYaw()+headRotation.getY()));
 
         playSpellEffects(EffectPosition.TARGET, armorStandLocation);
         ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
-        armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + headRotation.getX()*(toRadian),
+        armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotation.getX()),
                                                  armorStand.getHeadPose().getY(),
-                                              armorStand.getHeadPose().getZ() + headRotation.getZ()*(toRadian)));
+                                              armorStand.getHeadPose().getZ() + Math.toRadians(headRotation.getZ())));
         armorStand.setSilent(true);
         armorStand.setVisible(false);
         armorStand.setGravity(false);
