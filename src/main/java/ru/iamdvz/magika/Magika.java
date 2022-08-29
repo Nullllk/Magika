@@ -1,6 +1,5 @@
 package ru.iamdvz.magika;
 
-import com.nisovin.magicspells.events.MagicSpellsLoadingEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.Plugin;

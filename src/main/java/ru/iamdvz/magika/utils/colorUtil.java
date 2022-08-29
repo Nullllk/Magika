@@ -4,9 +4,8 @@ import org.bukkit.Color;
 
 public class colorUtil {
     public static Color hexToRGBColor(String hex) {
-        if (hex == null || hex.length() < 6) return null; // return null if string is too short or null
+        if (hex == null || hex.length() < 6) return null;
 
-        // extract components and parse components
         try {
             final var r = Integer.parseInt(hex.substring(0, 2), 16);
             final var g = Integer.parseInt(hex.substring(2, 4), 16);
