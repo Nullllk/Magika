@@ -16,11 +16,13 @@ repositories {
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.codemc.org/repository/maven-public/' }
 }
 
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT'
     implementation 'com.github.TheComputerGeek2.MagicSpells:core:main-SNAPSHOT:dev'
+    implementation "de.tr7zw:item-nbt-api-plugin:2.10.0"
 }
 
 def targetJavaVersion = 17
