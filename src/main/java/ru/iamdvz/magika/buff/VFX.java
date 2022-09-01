@@ -4,6 +4,7 @@ import com.nisovin.magicspells.MagicSpells;
 import com.nisovin.magicspells.spelleffects.EffectPosition;
 import com.nisovin.magicspells.spells.BuffSpell;
 import com.nisovin.magicspells.util.MagicConfig;
+import com.nisovin.magicspells.util.SpellData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -22,14 +23,14 @@ import ru.iamdvz.magika.utils.colorUtil;
 import java.util.*;
 
 public class VFX extends BuffSpell {
-    private List<ItemStack> itemListIS = new ArrayList<>();
-    private EquipmentSlot equipmentSlot;
+    private final List<ItemStack> itemListIS = new ArrayList<>();
+    private final EquipmentSlot equipmentSlot;
     private final Set<UUID> players;
-    private Vector headRotation;
-    private Vector headRotationSpeed;
+    private final Vector headRotation;
+    private final Vector headRotationSpeed;
     private List<String> itemList;
-    private Vector relativeOffset;
-    private boolean orientYaw;
+    private final Vector relativeOffset;
+    private final boolean orientYaw;
 
     public VFX(MagicConfig config, String spellName) {
         super(config, spellName);
@@ -63,7 +64,7 @@ public class VFX extends BuffSpell {
     @Override
     public boolean castBuff(LivingEntity entity, float power, String[] args) {
         players.add(entity.getUniqueId());
-        playSpellEffects(EffectPosition.CASTER, entity);
+        playSpellEffects(EffectPosition.CASTER, entity, new SpellData(entity));
         armorstandSpawn((Player) entity);
         return true;
     }
@@ -86,12 +87,12 @@ public class VFX extends BuffSpell {
     private boolean armorstandSpawn(Player player){
         Location playerLocation = player.getLocation();
         Location armorStandLocation = new Location(playerLocation.getWorld(),
-                playerLocation.getX() + relativeOffset.getX()*Math.cos(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.cos(Math.toRadians(playerLocation.getYaw())),
-                playerLocation.getY() + relativeOffset.getY(),
-                playerLocation.getZ() + relativeOffset.getX()*Math.sin(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.sin(Math.toRadians(playerLocation.getYaw())));
+                                                playerLocation.getX() + relativeOffset.getX()*Math.cos(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.cos(Math.toRadians(playerLocation.getYaw())),
+                                                playerLocation.getY() + relativeOffset.getY(),
+                                                playerLocation.getZ() + relativeOffset.getX()*Math.sin(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.sin(Math.toRadians(playerLocation.getYaw())));
         armorStandLocation.setYaw((float) (playerLocation.getYaw()+headRotation.getY()));
 
-        playSpellEffects(EffectPosition.TARGET, armorStandLocation);
+        playSpellEffects(EffectPosition.TARGET, armorStandLocation, new SpellData(player));
         ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
         armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotation.getX()),
                                                  armorStand.getHeadPose().getY(),
@@ -101,8 +102,8 @@ public class VFX extends BuffSpell {
         armorStand.setGravity(false);
         armorStand.setCollidable(false);
         armorStand.setInvulnerable(true);
-        armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
         armorStand.addScoreboardTag("MS_ARMOR_STAND");
+        armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
 
         final int[] duration = {0};
         int orientYawInt = orientYaw ? 1 : 0;
@@ -121,10 +122,9 @@ public class VFX extends BuffSpell {
                         relativeOffset.getY(),
                         relativeOffset.getX()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()))));
                 if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0){
-                    armorStand.setHeadPose(new EulerAngle(
-                            armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
-                            armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
-                            armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
+                    armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
+                                                          armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
+                                                          armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
                 }
                 duration[0]++;
                 if (duration[0] > itemListIS.size()){
