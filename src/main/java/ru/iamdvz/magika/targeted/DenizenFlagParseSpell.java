@@ -62,7 +62,7 @@ public class DenizenFlagParseSpell extends TargetedSpell implements TargetedEnti
             person = target;
         }
         NBTItem nbtItem = new NBTItem(new ItemStack(Material.FEATHER));
-        if (slot != 0 && person.getInventory().getItem(slot).getType() != Material.AIR) {
+        if (slot != 0 && Objects.requireNonNull(person.getInventory().getItem(slot)).getType() != Material.AIR) {
             nbtItem = new NBTItem(Objects.requireNonNull(person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot))));
         }
         if ((!Objects.equals(equipmentSlot, "NONE")) && person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot)).getType() != Material.AIR) {
