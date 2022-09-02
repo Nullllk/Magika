@@ -1,5 +1,3 @@
 # Magika
 
-Paper 1.18.2 and higher
-
-Paper 1.16.5 is tested
+Paper 1.18.2 (java 17+) and higher
