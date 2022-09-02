@@ -42,12 +42,18 @@ public class DenizenFlagParseSpell extends TargetedSpell implements TargetedEnti
 
     @Override
     public boolean castAtEntity(LivingEntity caster, LivingEntity target, float power) {
-        return false;
+        if (caster instanceof Player player1 && target instanceof Player player2) {
+            setFlag((Player) caster, (Player) target);
+        }
+        return true;
     }
 
     @Override
     public boolean castAtEntity(LivingEntity target, float power) {
-        return false;
+        if (target instanceof Player player) {
+            setFlag((Player) target, (Player) target);
+        }
+        return true;
     }
 
     private void setFlag(Player caster, Player target) {
