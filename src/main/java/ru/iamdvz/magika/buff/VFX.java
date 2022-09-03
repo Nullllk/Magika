@@ -28,6 +28,7 @@ public class VFX extends BuffSpell {
     private final Set<UUID> players;
     private final Vector headRotation;
     private final Vector headRotationSpeed;
+    private final int spawnDelay;
     private List<String> itemList;
     private final Vector relativeOffset;
     private final boolean orientYaw;
@@ -38,6 +39,7 @@ public class VFX extends BuffSpell {
         headRotation = getConfigVector("head-rotation", "0,0,0");
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
         headRotationSpeed = getConfigVector("head-rotation-speed", "0,0,0");
+        spawnDelay = getConfigInt("spawn-delay", 1);
         orientYaw = getConfigBoolean("orient-yaw", false);
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
@@ -131,7 +133,7 @@ public class VFX extends BuffSpell {
                     duration[0] = 0;
                 }
             }
-        }.runTaskTimer(MagicSpells.getInstance(), 1, 1);
+        }.runTaskTimer(MagicSpells.getInstance(), spawnDelay, 1);
         return true;
     }
 }

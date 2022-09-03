@@ -27,6 +27,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
     private final Vector headRotation;
     private final Vector headRotationSpeed;
     private final int maxDuration;
+    private final int spawnDelay;
     private List<String> itemList;
     private final Vector relativeOffset;
 
@@ -37,6 +38,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
         headRotationSpeed = getConfigVector("head-rotation-speed", "0,0,0");
         maxDuration = getConfigInt("max-duration", itemList.size());
+        spawnDelay = getConfigInt("spawn-delay", 1);
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
         for (String item : itemList){
@@ -116,7 +118,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
                 }
                 duration[0]++;
             }
-        }.runTaskTimer(MagicSpells.getInstance(), 1, 1);
+        }.runTaskTimer(MagicSpells.getInstance(), spawnDelay, 1);
         return true;
     }
 }

@@ -14,7 +14,6 @@ public class CastSpell extends InstantSpell {
 
     public CastSpell(MagicConfig config, String spellName) {
         super(config, spellName);
-
         castSpellName = getConfigString("spell-name", null);
     }
 
