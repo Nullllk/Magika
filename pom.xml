@@ -75,6 +75,10 @@
             <id>destroystokyo-repo</id>
             <url>https://repo.destroystokyo.com/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>everything</id>
+            <url>https://repo.citizensnpcs.co</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -95,6 +99,12 @@
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api-plugin</artifactId>
             <version>2.10.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.denizenscript</groupId>
+            <artifactId>denizen</artifactId>
+            <version>1.2.5-20220827.124542-6415</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

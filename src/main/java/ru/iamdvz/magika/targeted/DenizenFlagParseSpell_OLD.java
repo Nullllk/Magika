@@ -1,10 +1,10 @@
 package ru.iamdvz.magika.targeted;
 
-import com.denizenscript.denizen.objects.ItemTag;
 import com.nisovin.magicspells.MagicSpells;
 import com.nisovin.magicspells.spells.TargetedEntitySpell;
 import com.nisovin.magicspells.spells.TargetedSpell;
 import com.nisovin.magicspells.util.MagicConfig;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 
-public class DenizenFlagParseSpell extends TargetedSpell implements TargetedEntitySpell {
+public class DenizenFlagParseSpell_OLD extends TargetedSpell implements TargetedEntitySpell {
     private final String flagName;
     private final String variableName;
     private final String parseType;
@@ -22,7 +22,7 @@ public class DenizenFlagParseSpell extends TargetedSpell implements TargetedEnti
     private final String equipmentSlot;
 
 
-    public DenizenFlagParseSpell(MagicConfig config, String spellName) {
+    public DenizenFlagParseSpell_OLD(MagicConfig config, String spellName) {
         super(config, spellName);
         flagName = getConfigString("flag-name", null);
         variableName = getConfigString("variable-name", flagName);
@@ -61,21 +61,24 @@ public class DenizenFlagParseSpell extends TargetedSpell implements TargetedEnti
         if (targeted) {
             person = target;
         }
-        ItemTag nbtItem = new ItemTag(new ItemStack(Material.FEATHER));
+        NBTItem nbtItem = new NBTItem(new ItemStack(Material.FEATHER));
         if (slot != 0 && Objects.requireNonNull(person.getInventory().getItem(slot)).getType() != Material.AIR) {
-            nbtItem = new ItemTag(Objects.requireNonNull(person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot))));
+            nbtItem = new NBTItem(Objects.requireNonNull(person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot))));
         }
         if ((!Objects.equals(equipmentSlot, "NONE")) && person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot)).getType() != Material.AIR) {
-            nbtItem = new ItemTag(Objects.requireNonNull(person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot))));
+            nbtItem = new NBTItem(Objects.requireNonNull(person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot))));
         }
-        if (nbtItem.getFlagTracker().getFlagMap().keys().contains(flagName)){
-            switch (parseType.toUpperCase()) {
-                case "SET":
-                    MagicSpells.getVariableManager().set(variableName, person, String.valueOf(nbtItem.getFlagTracker().getFlagValue(flagName)));
-                case "ADD":
-                    MagicSpells.getVariableManager().set(variableName, person, MagicSpells.getVariableManager().getValue(variableName, person)+Double.parseDouble(String.valueOf(nbtItem.getFlagTracker().getFlagValue(flagName))));
+        try { nbtItem.getCompound("Denizen").getKeys(); } catch (Exception e) {return;}
+        String denizenFlags = nbtItem.getCompound("Denizen").getString("flags");
+        for (String flag : denizenFlags.substring(5, denizenFlags.length() - 1).split(";")){
+            if (Objects.equals(flagName, flag.split("=")[0])){
+                switch (parseType.toUpperCase()) {
+                    case "SET":
+                        MagicSpells.getVariableManager().set(variableName, person, Double.parseDouble(flag.split("=")[1]));
+                    case "ADD":
+                        MagicSpells.getVariableManager().set(variableName, person, MagicSpells.getVariableManager().getValue(variableName, person)+Double.parseDouble(flag.split("=")[1]));
+                }
             }
-
         }
     }
 }
