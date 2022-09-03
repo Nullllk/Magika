@@ -32,9 +32,14 @@ public class CastSpell extends InstantSpell {
                 castSpellName = args[Integer.parseInt(castSpellName.split(":")[1])-1];
                 if (MagicSpells.getSpells().containsKey(castSpellName)){
                     MagicSpells.getSpellByInternalName(castSpellName).cast(caster, power, args);
+                    return PostCastAction.HANDLE_NORMALLY;
                 }
             }
+            if (MagicSpells.getSpells().containsKey(castSpellName)) {
+                MagicSpells.getSpellByInternalName(castSpellName).cast(caster, power, args);
+                return PostCastAction.HANDLE_NORMALLY;
             }
+        }
         return null;
     }
 }
