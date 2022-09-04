@@ -83,8 +83,10 @@ public class DenizenFlagParseSpell extends TargetedSpell implements TargetedEnti
             switch (parseType.toUpperCase()) {
                 case "SET":
                     MagicSpells.getVariableManager().set(variableName, person, String.valueOf(nbtItem.getFlagTracker().getFlagValue(flagName)));
+                    break;
                 case "ADD":
                     MagicSpells.getVariableManager().set(variableName, person, MagicSpells.getVariableManager().getValue(variableName, person)+Double.parseDouble(String.valueOf(nbtItem.getFlagTracker().getFlagValue(flagName))));
+                    break;
             }
         }
     }

@@ -102,6 +102,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>ru.aslcraft.core</groupId>>
+            <artifactId>Core</artifactId>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/ejCore-1.2.18-BETA.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.denizenscript</groupId>
             <artifactId>denizen</artifactId>
             <version>1.2.5-20220827.124542-6415</version>
