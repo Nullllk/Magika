@@ -1,5 +1,7 @@
 package ru.iamdvz.magika.buff;
 
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import com.nisovin.magicspells.MagicSpells;
 import com.nisovin.magicspells.spelleffects.EffectPosition;
 import com.nisovin.magicspells.spells.BuffSpell;
@@ -21,16 +23,18 @@ import org.bukkit.util.Vector;
 import ru.iamdvz.magika.utils.colorUtil;
 
 import java.util.*;
-
 public class VFX extends BuffSpell {
     private final List<ItemStack> itemListIS = new ArrayList<>();
     private final EquipmentSlot equipmentSlot;
     private final Set<UUID> players;
     private final Vector headRotation;
     private final Vector headRotationSpeed;
-    private final int spawnDelay;
+    private int spawnDelay;
     private List<String> itemList;
     private final Vector relativeOffset;
+    private final String equationX;
+    private final String equationY;
+    private final String equationZ;
     private final boolean orientYaw;
 
     public VFX(MagicConfig config, String spellName) {
@@ -40,7 +44,11 @@ public class VFX extends BuffSpell {
         relativeOffset = getConfigVector("relative-offset", "0,0,0");
         headRotationSpeed = getConfigVector("head-rotation-speed", "0,0,0");
         spawnDelay = getConfigInt("spawn-delay", 1);
+        if (spawnDelay < 1) { spawnDelay = 1; }
         orientYaw = getConfigBoolean("orient-yaw", false);
+        equationX = getConfigString("equation-x", null);
+        equationY = getConfigString("equation-y", null);
+        equationZ = getConfigString("equation-z", null);
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
         players = new HashSet<>();
@@ -108,7 +116,29 @@ public class VFX extends BuffSpell {
         armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
 
         final int[] duration = {0};
+        final int[] ticker = {0};
         int orientYawInt = orientYaw ? 1 : 0;
+        Expression expr_x = null;
+        Expression expr_y = null;
+        Expression expr_z = null;
+        if (equationX != null) {
+            expr_x = new ExpressionBuilder(equationX).variable("t").build();
+            expr_x.setVariable("t", 0);
+        }
+        if (equationY != null) {
+            expr_y = new ExpressionBuilder(equationY).variable("t").build();
+            expr_y.setVariable("t", 0);
+        }
+        if (equationZ != null) {
+            expr_z = new ExpressionBuilder(equationZ).variable("t").build();
+            expr_z.setVariable("t", 0);
+        }
+        final double[] xCoord = new double[1];
+        final double[] yCoord = new double[1];
+        final double[] zCoord = new double[1];
+        Expression finalExpr_x = expr_x;
+        Expression finalExpr_y = expr_y;
+        Expression finalExpr_z = expr_z;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -116,19 +146,34 @@ public class VFX extends BuffSpell {
                     armorStand.remove();
                     this.cancel();
                 }
-                if (itemListIS != null && duration[0] < itemListIS.size()) {
+                if (duration[0] < itemListIS.size()) {
                     armorStand.setItem(equipmentSlot, itemListIS.get(duration[0]));
                 }
-                armorStand.teleport(player.getLocation().add(
-                        relativeOffset.getX()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw())),
-                        relativeOffset.getY(),
-                        relativeOffset.getX()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()))));
+                xCoord[0] = relativeOffset.getX()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()));
+                yCoord[0] = relativeOffset.getY();
+                zCoord[0] = relativeOffset.getX()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()));
+                if (equationX != null) {xCoord[0] += finalExpr_x.evaluate();}
+                if (equationY != null) {yCoord[0] += finalExpr_y.evaluate();}
+                if (equationZ != null) {zCoord[0] += finalExpr_z.evaluate();}
+
+                armorStand.teleport(player.getLocation().add(xCoord[0], yCoord[0], zCoord[0]));
+
                 if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0){
                     armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
                                                           armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
                                                           armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
                 }
+                ticker[0]++;
                 duration[0]++;
+                if (equationX != null) {
+                    finalExpr_x.setVariable("t", ticker[0]);
+                }
+                if (equationY != null) {
+                    finalExpr_y.setVariable("t", ticker[0]);
+                }
+                if (equationZ != null) {
+                    finalExpr_z.setVariable("t", ticker[0]);
+                }
                 if (duration[0] > itemListIS.size()){
                     duration[0] = 0;
                 }

@@ -5,7 +5,6 @@ import com.nisovin.magicspells.MagicSpells;
 import com.nisovin.magicspells.spells.TargetedEntitySpell;
 import com.nisovin.magicspells.spells.TargetedSpell;
 import com.nisovin.magicspells.util.MagicConfig;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -70,23 +69,21 @@ public class DenizenFlagParseSpell extends TargetedSpell implements TargetedEnti
         if (targeted) {
             person = target;
         }
-        ItemTag nbtItem = new ItemTag(new ItemStack(Material.FEATHER));
+        ItemTag slotItem = new ItemTag(new ItemStack(Material.FEATHER));
         if ((!Objects.equals(equipmentSlot, "NONE")) && person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot)).getType() != Material.AIR) {
-            nbtItem = new ItemTag(Objects.requireNonNull(person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot))));
+            slotItem = new ItemTag(Objects.requireNonNull(person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot))));
         }
         else {
             if (slot > 0 && Objects.requireNonNull(person.getInventory().getItem(slot)).getType() != Material.AIR) {
-                nbtItem = new ItemTag(Objects.requireNonNull(person.getInventory().getItem(EquipmentSlot.valueOf(equipmentSlot))));
+                slotItem = new ItemTag(Objects.requireNonNull(person.getInventory().getItem(slot)));
             }
         }
-        if (nbtItem.getFlagTracker().getFlagMap().keys().contains(flagName)){
+        if (slotItem.getFlagTracker().getFlagMap().keys().contains(flagName)){
             switch (parseType.toUpperCase()) {
-                case "SET":
-                    MagicSpells.getVariableManager().set(variableName, person, String.valueOf(nbtItem.getFlagTracker().getFlagValue(flagName)));
-                    break;
-                case "ADD":
-                    MagicSpells.getVariableManager().set(variableName, person, MagicSpells.getVariableManager().getValue(variableName, person)+Double.parseDouble(String.valueOf(nbtItem.getFlagTracker().getFlagValue(flagName))));
-                    break;
+                case "SET" ->
+                        MagicSpells.getVariableManager().set(variableName, person, String.valueOf(slotItem.getFlagTracker().getFlagValue(flagName)));
+                case "ADD" ->
+                        MagicSpells.getVariableManager().set(variableName, person, MagicSpells.getVariableManager().getValue(variableName, person) + Double.parseDouble(String.valueOf(slotItem.getFlagTracker().getFlagValue(flagName))));
             }
         }
     }

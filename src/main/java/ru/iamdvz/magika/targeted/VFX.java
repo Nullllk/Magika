@@ -27,7 +27,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
     private final Vector headRotation;
     private final Vector headRotationSpeed;
     private final int maxDuration;
-    private final int spawnDelay;
+    private int spawnDelay;
     private List<String> itemList;
     private final Vector relativeOffset;
 
@@ -39,6 +39,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         headRotationSpeed = getConfigVector("head-rotation-speed", "0,0,0");
         maxDuration = getConfigInt("max-duration", itemList.size());
         spawnDelay = getConfigInt("spawn-delay", 1);
+        if (spawnDelay < 1) { spawnDelay = 1; }
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
         for (String item : itemList){
@@ -102,7 +103,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (itemListIS != null && duration[0] < itemListIS.size()) {
+                if (duration[0] < itemListIS.size()) {
                     armorStand.setItem(equipmentSlot, itemListIS.get(duration[0]));
                 }
                 else {

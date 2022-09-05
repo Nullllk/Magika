@@ -102,6 +102,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>net.objecthunter</groupId>
+            <artifactId>exp4j</artifactId>
+            <version>0.4.8</version>
+            <systemPath>${basedir}/libs/exp4j-0.4.8.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+        <dependency>
             <groupId>ru.aslcraft.core</groupId>>
             <artifactId>Core</artifactId>
             <scope>system</scope>
