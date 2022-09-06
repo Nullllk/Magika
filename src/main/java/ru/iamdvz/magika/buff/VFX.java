@@ -6,7 +6,6 @@ import com.nisovin.magicspells.MagicSpells;
 import com.nisovin.magicspells.spelleffects.EffectPosition;
 import com.nisovin.magicspells.spells.BuffSpell;
 import com.nisovin.magicspells.util.MagicConfig;
-import com.nisovin.magicspells.util.SpellData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -74,7 +73,7 @@ public class VFX extends BuffSpell {
     @Override
     public boolean castBuff(LivingEntity entity, float power, String[] args) {
         players.add(entity.getUniqueId());
-        playSpellEffects(EffectPosition.CASTER, entity, new SpellData(entity));
+        playSpellEffects(EffectPosition.CASTER, entity);
         armorstandSpawn((Player) entity);
         return true;
     }
@@ -102,7 +101,7 @@ public class VFX extends BuffSpell {
                                                 playerLocation.getZ() + relativeOffset.getX()*Math.sin(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.sin(Math.toRadians(playerLocation.getYaw())));
         armorStandLocation.setYaw((float) (playerLocation.getYaw()+headRotation.getY()));
 
-        playSpellEffects(EffectPosition.TARGET, armorStandLocation, new SpellData(player));
+        playSpellEffects(EffectPosition.TARGET, armorStandLocation);
         ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
         armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotation.getX()),
                                                  armorStand.getHeadPose().getY(),

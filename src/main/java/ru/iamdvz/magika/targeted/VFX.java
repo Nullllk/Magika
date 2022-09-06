@@ -5,7 +5,6 @@ import com.nisovin.magicspells.spelleffects.EffectPosition;
 import com.nisovin.magicspells.spells.TargetedLocationSpell;
 import com.nisovin.magicspells.spells.TargetedSpell;
 import com.nisovin.magicspells.util.MagicConfig;
-import com.nisovin.magicspells.util.SpellData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -63,7 +62,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
 
     @Override
     public PostCastAction castSpell(LivingEntity caster, SpellCastState state, float power, String[] args) {
-        playSpellEffects(EffectPosition.CASTER, caster, new SpellData(caster));
+        playSpellEffects(EffectPosition.CASTER, caster);
         return PostCastAction.HANDLE_NORMALLY;
     }
 
@@ -86,7 +85,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
                                                 target.getZ() + relativeOffset.getX()*Math.sin(Math.toRadians(target.getYaw()+90)) + relativeOffset.getZ()*Math.sin(Math.toRadians(target.getYaw())));
         armorStandLocation.setYaw((float) (target.getYaw()+headRotation.getY()));
 
-        playSpellEffects(EffectPosition.TARGET, armorStandLocation, new SpellData(player));
+        playSpellEffects(EffectPosition.TARGET, armorStandLocation);
         ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
         armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotation.getX()),
                                                  armorStand.getHeadPose().getY(),
