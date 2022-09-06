@@ -117,27 +117,27 @@ public class VFX extends BuffSpell {
         final int[] duration = {0};
         final int[] ticker = {0};
         int orientYawInt = orientYaw ? 1 : 0;
-        Expression expr_x = null;
-        Expression expr_y = null;
-        Expression expr_z = null;
+        Expression exprX = null;
+        Expression exprY = null;
+        Expression exprZ = null;
         if (equationX != null) {
-            expr_x = new ExpressionBuilder(equationX).variable("t").build();
-            expr_x.setVariable("t", 0);
+            exprX = new ExpressionBuilder(equationX).variable("t").build();
+            exprX.setVariable("t", 0);
         }
         if (equationY != null) {
-            expr_y = new ExpressionBuilder(equationY).variable("t").build();
-            expr_y.setVariable("t", 0);
+            exprY = new ExpressionBuilder(equationY).variable("t").build();
+            exprY.setVariable("t", 0);
         }
         if (equationZ != null) {
-            expr_z = new ExpressionBuilder(equationZ).variable("t").build();
-            expr_z.setVariable("t", 0);
+            exprZ = new ExpressionBuilder(equationZ).variable("t").build();
+            exprZ.setVariable("t", 0);
         }
         final double[] xCoord = new double[1];
         final double[] yCoord = new double[1];
         final double[] zCoord = new double[1];
-        Expression finalExpr_x = expr_x;
-        Expression finalExpr_y = expr_y;
-        Expression finalExpr_z = expr_z;
+        Expression finalExprX = exprX;
+        Expression finalExprY = exprY;
+        Expression finalExprZ = exprZ;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -151,9 +151,9 @@ public class VFX extends BuffSpell {
                 xCoord[0] = relativeOffset.getX()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()));
                 yCoord[0] = relativeOffset.getY();
                 zCoord[0] = relativeOffset.getX()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()));
-                if (equationX != null) {xCoord[0] += finalExpr_x.evaluate();}
-                if (equationY != null) {yCoord[0] += finalExpr_y.evaluate();}
-                if (equationZ != null) {zCoord[0] += finalExpr_z.evaluate();}
+                if (equationX != null) {xCoord[0] += finalExprX.evaluate();}
+                if (equationY != null) {yCoord[0] += finalExprY.evaluate();}
+                if (equationZ != null) {zCoord[0] += finalExprZ.evaluate();}
 
                 armorStand.teleport(player.getLocation().add(xCoord[0], yCoord[0], zCoord[0]));
 
@@ -165,13 +165,13 @@ public class VFX extends BuffSpell {
                 ticker[0]++;
                 duration[0]++;
                 if (equationX != null) {
-                    finalExpr_x.setVariable("t", ticker[0]);
+                    finalExprX.setVariable("t", ticker[0]);
                 }
                 if (equationY != null) {
-                    finalExpr_y.setVariable("t", ticker[0]);
+                    finalExprY.setVariable("t", ticker[0]);
                 }
                 if (equationZ != null) {
-                    finalExpr_z.setVariable("t", ticker[0]);
+                    finalExprZ.setVariable("t", ticker[0]);
                 }
                 if (duration[0] > itemListIS.size()){
                     duration[0] = 0;

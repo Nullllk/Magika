@@ -5,6 +5,8 @@ import com.nisovin.magicspells.spelleffects.EffectPosition;
 import com.nisovin.magicspells.spells.TargetedLocationSpell;
 import com.nisovin.magicspells.spells.TargetedSpell;
 import com.nisovin.magicspells.util.MagicConfig;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -29,6 +31,9 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
     private int spawnDelay;
     private List<String> itemList;
     private final Vector relativeOffset;
+    private final String equationX;
+    private final String equationY;
+    private final String equationZ;
 
     public VFX(MagicConfig config, String spellName) {
         super(config, spellName);
@@ -39,6 +44,9 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         maxDuration = getConfigInt("max-duration", itemList.size());
         spawnDelay = getConfigInt("spawn-delay", 1);
         if (spawnDelay < 1) { spawnDelay = 1; }
+        equationX = getConfigString("equation-x", null);
+        equationY = getConfigString("equation-y", null);
+        equationZ = getConfigString("equation-z", null);
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
         for (String item : itemList){
@@ -99,6 +107,28 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
 
         final int[] duration = {0};
+        final int[] ticker = {0};
+        Expression exprX = null;
+        Expression exprY = null;
+        Expression exprZ = null;
+        if (equationX != null) {
+            exprX = new ExpressionBuilder(equationX).variable("t").build();
+            exprX.setVariable("t", 0);
+        }
+        if (equationY != null) {
+            exprY = new ExpressionBuilder(equationY).variable("t").build();
+            exprY.setVariable("t", 0);
+        }
+        if (equationZ != null) {
+            exprZ = new ExpressionBuilder(equationZ).variable("t").build();
+            exprZ.setVariable("t", 0);
+        }
+        final double[] xCoord = new double[1];
+        final double[] yCoord = new double[1];
+        final double[] zCoord = new double[1];
+        Expression finalExprX = exprX;
+        Expression finalExprY = exprY;
+        Expression finalExprZ = exprZ;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -111,12 +141,28 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
                         this.cancel();
                     }
                 }
+                if (equationX != null) {xCoord[0] = finalExprX.evaluate();}
+                if (equationY != null) {yCoord[0] = finalExprY.evaluate();}
+                if (equationZ != null) {zCoord[0] = finalExprZ.evaluate();}
+                if (equationX != null && equationY != null && equationZ != null) {
+                    armorStand.teleport(armorStandLocation.add(xCoord[0],yCoord[0],zCoord[0]));
+                }
                 if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0){
                     armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
                                                           armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
                                                           armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
                 }
+                //ticker[0]++;
                 duration[0]++;
+                if (equationX != null) {
+                    finalExprX.setVariable("t", duration[0]);
+                }
+                if (equationY != null) {
+                    finalExprY.setVariable("t", duration[0]);
+                }
+                if (equationZ != null) {
+                    finalExprZ.setVariable("t", duration[0]);
+                }
             }
         }.runTaskTimer(MagicSpells.getInstance(), spawnDelay, 1);
         return true;
