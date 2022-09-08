@@ -7,8 +7,11 @@ import java.util.regex.Pattern;
 
 public class getFromBrackets {
     public static String get(String str) {
-        Pattern ptrn = Pattern.compile("\\((.*?)\\)");
-        //Matcher mtchr = ptrn.matcher(str);
-        return ptrn.matcher(str).group();
+        Pattern ptrn = Pattern.compile("(\\((.*?)\\))");
+        Matcher mtchr = ptrn.matcher(str);
+        if (mtchr.find()) {
+            return mtchr.group(2);
+        }
+        return null;
     }
 }

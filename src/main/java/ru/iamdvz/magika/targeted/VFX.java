@@ -18,9 +18,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import ru.iamdvz.magika.utils.colorUtil;
+import ru.iamdvz.magika.utils.getFromBrackets;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class VFX extends TargetedSpell implements TargetedLocationSpell {
     private final List<ItemStack> itemListIS = new ArrayList<>();
@@ -49,20 +51,26 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         equationZ = getConfigString("equation-z", null);
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
 
-        for (String item : itemList){
-            ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
-            if (itemTemp.getType() == Material.POTION) {
-                PotionMeta itemTempM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
-                itemTempM.setColor(colorUtil.hexToRGBColor(item.split(",")[1].split(":")[1]));
-                itemTempM.setCustomModelData(Integer.parseInt(item.split(":")[1].split(",")[0]));
-                itemTemp.setItemMeta(itemTempM);
+        for (String item : itemList) {
+            if (item.contains("DELAY")) {
+                MagicSpells.log(getFromBrackets.get(item));
+                for (int i = 0; i < Integer.parseInt(getFromBrackets.get(item)); i++) {
+                    itemListIS.add(new ItemStack(Material.AIR));
+                }
+            } else {
+                ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
+                if (itemTemp.getType() == Material.POTION) {
+                    PotionMeta itemTempM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
+                    itemTempM.setColor(colorUtil.hexToRGBColor(item.split(",")[1].split(":")[1]));
+                    itemTempM.setCustomModelData(Integer.parseInt(item.split(":")[1].split(",")[0]));
+                    itemTemp.setItemMeta(itemTempM);
+                } else {
+                    ItemMeta itemTempM = itemTemp.getItemMeta();
+                    itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
+                    itemTemp.setItemMeta(itemTempM);
+                }
+                itemListIS.add(itemTemp);
             }
-            else {
-                ItemMeta itemTempM = itemTemp.getItemMeta();
-                itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
-                itemTemp.setItemMeta(itemTempM);
-            }
-            itemListIS.add(itemTemp);
         }
         itemList = null;
 
@@ -86,7 +94,7 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         return false;
     }
 
-    private boolean armorstandSpawn(Location target, Player player){
+    private boolean armorstandSpawn(Location target, Player player) {
         Location armorStandLocation = new Location(target.getWorld(),
                                                 target.getX() + relativeOffset.getX()*Math.cos(Math.toRadians(target.getYaw()+90)) + relativeOffset.getZ()*Math.cos(Math.toRadians(target.getYaw())),
                                                 target.getY() + relativeOffset.getY(),
@@ -107,7 +115,6 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         armorStand.addDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.LEGS, EquipmentSlot.OFF_HAND);
 
         final int[] duration = {0};
-        final int[] ticker = {0};
         Expression exprX = null;
         Expression exprY = null;
         Expression exprZ = null;
@@ -132,37 +139,36 @@ public class VFX extends TargetedSpell implements TargetedLocationSpell {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (duration[0] < itemListIS.size()) {
+                if (duration[0] < itemListIS.size() && itemListIS.get(duration[0]).getType() != Material.AIR) {
                     armorStand.setItem(equipmentSlot, itemListIS.get(duration[0]));
                 }
                 else {
-                    if (duration[0] >= maxDuration){
+                    if (duration[0] >= maxDuration) {
                         armorStand.remove();
                         this.cancel();
                     }
                 }
-                if (equationX != null) {xCoord[0] = finalExprX.evaluate();}
-                if (equationY != null) {yCoord[0] = finalExprY.evaluate();}
-                if (equationZ != null) {zCoord[0] = finalExprZ.evaluate();}
-                if (equationX != null && equationY != null && equationZ != null) {
-                    armorStand.teleport(armorStandLocation.add(xCoord[0],yCoord[0],zCoord[0]));
+                if (equationX != null) {
+                    xCoord[0] = finalExprX.evaluate();
+                    finalExprX.setVariable("t", duration[0]);
                 }
-                if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0){
+                if (equationY != null) {
+                    yCoord[0] = finalExprY.evaluate();
+                    finalExprY.setVariable("t", duration[0]);
+                }
+                if (equationZ != null) {
+                    zCoord[0] = finalExprZ.evaluate();
+                    finalExprZ.setVariable("t", duration[0]);
+                }
+                if (equationX != null && equationY != null && equationZ != null) {
+                    armorStand.teleport(new Location(armorStandLocation.getWorld(), armorStandLocation.getX() + xCoord[0], armorStandLocation.getY() + yCoord[0], armorStandLocation.getZ() + zCoord[0])); //armorStandLocation.add(xCoord[0],yCoord[0],zCoord[0])));
+                }
+                if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0) {
                     armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
                                                           armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
                                                           armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
                 }
-                //ticker[0]++;
                 duration[0]++;
-                if (equationX != null) {
-                    finalExprX.setVariable("t", duration[0]);
-                }
-                if (equationY != null) {
-                    finalExprY.setVariable("t", duration[0]);
-                }
-                if (equationZ != null) {
-                    finalExprZ.setVariable("t", duration[0]);
-                }
             }
         }.runTaskTimer(MagicSpells.getInstance(), spawnDelay, 1);
         return true;

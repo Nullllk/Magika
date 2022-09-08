@@ -20,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import ru.iamdvz.magika.utils.colorUtil;
+import ru.iamdvz.magika.utils.getFromBrackets;
 
 import java.util.*;
 public class VFX extends BuffSpell {
@@ -52,20 +53,26 @@ public class VFX extends BuffSpell {
 
         players = new HashSet<>();
 
-        for (String item : itemList){
-            ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
-            if (itemTemp.getType() == Material.POTION) {
-                PotionMeta itemTempM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
-                itemTempM.setColor(colorUtil.hexToRGBColor(item.split(",")[1].split(":")[1]));
-                itemTempM.setCustomModelData(Integer.parseInt(item.split(":")[1].split(",")[0]));
-                itemTemp.setItemMeta(itemTempM);
+        for (String item : itemList) {
+            if (item.contains("DELAY")) {
+                MagicSpells.log(getFromBrackets.get(item));
+                for (int i = 0; i < Integer.parseInt(getFromBrackets.get(item)); i++) {
+                    itemListIS.add(new ItemStack(Material.AIR));
+                }
+            } else {
+                ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
+                if (itemTemp.getType() == Material.POTION) {
+                    PotionMeta itemTempM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
+                    itemTempM.setColor(colorUtil.hexToRGBColor(item.split(",")[1].split(":")[1]));
+                    itemTempM.setCustomModelData(Integer.parseInt(item.split(":")[1].split(",")[0]));
+                    itemTemp.setItemMeta(itemTempM);
+                } else {
+                    ItemMeta itemTempM = itemTemp.getItemMeta();
+                    itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
+                    itemTemp.setItemMeta(itemTempM);
+                }
+                itemListIS.add(itemTemp);
             }
-            else {
-                ItemMeta itemTempM = itemTemp.getItemMeta();
-                itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
-                itemTemp.setItemMeta(itemTempM);
-            }
-            itemListIS.add(itemTemp);
         }
         itemList = null;
     }
@@ -145,15 +152,24 @@ public class VFX extends BuffSpell {
                     armorStand.remove();
                     this.cancel();
                 }
-                if (duration[0] < itemListIS.size()) {
+                if (duration[0] < itemListIS.size() && itemListIS.get(duration[0]).getType() != Material.AIR) {
                     armorStand.setItem(equipmentSlot, itemListIS.get(duration[0]));
                 }
                 xCoord[0] = relativeOffset.getX()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.cos(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()));
                 yCoord[0] = relativeOffset.getY();
                 zCoord[0] = relativeOffset.getX()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt)+90 + orientYawInt*player.getLocation().getYaw())) + relativeOffset.getZ()*Math.sin(Math.toRadians((playerLocation.getYaw()-playerLocation.getYaw()*orientYawInt) + orientYawInt*player.getLocation().getYaw()));
-                if (equationX != null) {xCoord[0] += finalExprX.evaluate();}
-                if (equationY != null) {yCoord[0] += finalExprY.evaluate();}
-                if (equationZ != null) {zCoord[0] += finalExprZ.evaluate();}
+                if (equationX != null) {
+                    xCoord[0] += finalExprX.evaluate();
+                    finalExprX.setVariable("t", ticker[0]);
+                }
+                if (equationY != null) {
+                    yCoord[0] += finalExprY.evaluate();
+                    finalExprY.setVariable("t", ticker[0]);
+                }
+                if (equationZ != null) {
+                    zCoord[0] += finalExprZ.evaluate();
+                    finalExprZ.setVariable("t", ticker[0]);
+                }
 
                 armorStand.teleport(player.getLocation().add(xCoord[0], yCoord[0], zCoord[0]));
 
@@ -162,20 +178,11 @@ public class VFX extends BuffSpell {
                                                           armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
                                                           armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
                 }
-                ticker[0]++;
-                duration[0]++;
-                if (equationX != null) {
-                    finalExprX.setVariable("t", ticker[0]);
-                }
-                if (equationY != null) {
-                    finalExprY.setVariable("t", ticker[0]);
-                }
-                if (equationZ != null) {
-                    finalExprZ.setVariable("t", ticker[0]);
-                }
                 if (duration[0] > itemListIS.size()){
                     duration[0] = 0;
                 }
+                ticker[0]++;
+                duration[0]++;
             }
         }.runTaskTimer(MagicSpells.getInstance(), spawnDelay, 1);
         return true;
