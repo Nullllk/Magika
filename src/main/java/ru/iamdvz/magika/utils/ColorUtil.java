@@ -2,7 +2,7 @@ package ru.iamdvz.magika.utils;
 
 import org.bukkit.Color;
 
-public class colorUtil {
+public class ColorUtil {
     public static Color hexToRGBColor(String hex) {
         if (hex == null || hex.length() < 6) return null;
 

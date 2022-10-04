@@ -19,12 +19,11 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
-import ru.iamdvz.magika.utils.ColorUtil;
-import ru.iamdvz.magika.utils.ParserUtil;
+import ru.iamdvz.magika.utils.ItemsUtil;
 
 import java.util.*;
-public class VFX extends BuffSpell {
-    private final List<ItemStack> itemListIS = new ArrayList<>();
+public class VFXrefactor extends BuffSpell {
+    private List<ItemStack> itemListIS = new ArrayList<>();
     private final EquipmentSlot equipmentSlot;
     private final Set<UUID> players;
     private final Vector headRotation;
@@ -37,7 +36,7 @@ public class VFX extends BuffSpell {
     private final String equationZ;
     private final boolean orientYaw;
 
-    public VFX(MagicConfig config, String spellName) {
+    public VFXrefactor(MagicConfig config, String spellName) {
         super(config, spellName);
         itemList = getConfigStringList("items-list", null);
         headRotation = getConfigVector("head-rotation", "0,0,0");
@@ -50,30 +49,9 @@ public class VFX extends BuffSpell {
         equationY = getConfigString("equation-y", null);
         equationZ = getConfigString("equation-z", null);
         equipmentSlot = EquipmentSlot.valueOf(getConfigString("equipment-slot", "HEAD").toUpperCase());
-
         players = new HashSet<>();
 
-        for (String item : itemList) {
-            if (item.contains("DELAY")) {
-                MagicSpells.log(ParserUtil.getFrom(item, "(", ")"));
-                for (int i = 0; i < Integer.parseInt(ParserUtil.getFrom(item, "(", ")")); i++) {
-                    itemListIS.add(new ItemStack(Material.AIR));
-                }
-            } else {
-                ItemStack itemTemp = new ItemStack(Material.valueOf(item.split(":")[0].toUpperCase()));
-                if (itemTemp.getType() == Material.POTION) {
-                    PotionMeta itemTempM = (PotionMeta) new ItemStack(Material.POTION).getItemMeta();
-                    itemTempM.setColor(ColorUtil.hexToRGBColor(item.split(",")[1].split(":")[1]));
-                    itemTempM.setCustomModelData(Integer.parseInt(item.split(":")[1].split(",")[0]));
-                    itemTemp.setItemMeta(itemTempM);
-                } else {
-                    ItemMeta itemTempM = itemTemp.getItemMeta();
-                    itemTempM.setCustomModelData(Integer.valueOf(item.split(":")[1].split(",")[0]));
-                    itemTemp.setItemMeta(itemTempM);
-                }
-                itemListIS.add(itemTemp);
-            }
-        }
+        itemListIS = ItemsUtil.stringListToItemStack(itemList);
         itemList = null;
     }
 
@@ -103,16 +81,16 @@ public class VFX extends BuffSpell {
     private boolean armorstandSpawn(Player player){
         Location playerLocation = player.getLocation();
         Location armorStandLocation = new Location(playerLocation.getWorld(),
-                                                playerLocation.getX() + relativeOffset.getX()*Math.cos(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.cos(Math.toRadians(playerLocation.getYaw())),
-                                                playerLocation.getY() + relativeOffset.getY(),
-                                                playerLocation.getZ() + relativeOffset.getX()*Math.sin(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.sin(Math.toRadians(playerLocation.getYaw())));
+                playerLocation.getX() + relativeOffset.getX()*Math.cos(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.cos(Math.toRadians(playerLocation.getYaw())),
+                playerLocation.getY() + relativeOffset.getY(),
+                playerLocation.getZ() + relativeOffset.getX()*Math.sin(Math.toRadians(playerLocation.getYaw()+90)) + relativeOffset.getZ()*Math.sin(Math.toRadians(playerLocation.getYaw())));
         armorStandLocation.setYaw((float) (playerLocation.getYaw()+headRotation.getY()));
 
         playSpellEffects(EffectPosition.TARGET, armorStandLocation);
         ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
         armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotation.getX()),
-                                                 armorStand.getHeadPose().getY(),
-                                              armorStand.getHeadPose().getZ() + Math.toRadians(headRotation.getZ())));
+                armorStand.getHeadPose().getY(),
+                armorStand.getHeadPose().getZ() + Math.toRadians(headRotation.getZ())));
         armorStand.setSilent(true);
         armorStand.setVisible(false);
         armorStand.setGravity(false);
@@ -175,8 +153,8 @@ public class VFX extends BuffSpell {
 
                 if (headRotationSpeed.getX() != 0 || headRotationSpeed.getY() != 0 || headRotationSpeed.getZ() != 0){
                     armorStand.setHeadPose(new EulerAngle(armorStand.getHeadPose().getX() + Math.toRadians(headRotationSpeed.getX()*duration[0]),
-                                                          armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
-                                                          armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
+                            armorStand.getHeadPose().getY() + Math.toRadians(headRotationSpeed.getY()*duration[0]),
+                            armorStand.getHeadPose().getZ() + Math.toRadians(headRotationSpeed.getZ()*duration[0])));
                 }
                 if (duration[0] > itemListIS.size()){
                     duration[0] = 0;

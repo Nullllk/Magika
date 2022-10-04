@@ -54,6 +54,10 @@
 
     <repositories>
         <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -79,6 +83,10 @@
             <id>everything</id>
             <url>https://repo.citizensnpcs.co</url>
         </repository>
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -89,36 +97,50 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.18.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.TheComputerGeek2.MagicSpells</groupId>
             <artifactId>core</artifactId>
             <version>main-a873e17a3e-1</version>
             <classifier>dev</classifier>
             <scope>dev</scope>
         </dependency>
-        <dependency>
-            <groupId>de.tr7zw</groupId>
-            <artifactId>item-nbt-api-plugin</artifactId>
-            <version>2.10.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.objecthunter</groupId>
-            <artifactId>exp4j</artifactId>
-            <version>0.4.8</version>
-            <systemPath>${basedir}/libs/exp4j-0.4.8.jar</systemPath>
-            <scope>system</scope>
-        </dependency>
-        <dependency>
-            <groupId>ru.aslcraft.core</groupId>>
-            <artifactId>Core</artifactId>
-            <scope>system</scope>
-            <systemPath>${basedir}/libs/ejCore-1.2.18-BETA.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.denizenscript</groupId>
-            <artifactId>denizen</artifactId>
-            <version>1.2.5-20220827.124542-6415</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+       <!--
+       <dependency>
+           <groupId>de.tr7zw</groupId>
+           <artifactId>item-nbt-api-plugin</artifactId>
+           <version>2.10.0</version>
+           <scope>provided</scope>
+       </dependency>
+       -->
+       <dependency>
+           <groupId>net.objecthunter</groupId>
+           <artifactId>exp4j</artifactId>
+           <version>0.4.8</version>
+           <systemPath>${basedir}/libs/exp4j-0.4.8.jar</systemPath>
+           <scope>system</scope>
+       </dependency>
+       <dependency>
+           <groupId>ru.aslcraft.core</groupId>>
+           <artifactId>Core</artifactId>
+           <scope>system</scope>
+           <systemPath>${basedir}/libs/ejCore-1.2.18-BETA.jar</systemPath>
+       </dependency>
+       <dependency>
+           <groupId>com.denizenscript</groupId>
+           <artifactId>denizen</artifactId>
+           <version>1.2.5-20220827.124542-6415</version>
+           <scope>provided</scope>
+       </dependency>
+       <dependency>
+           <groupId>com.comphenix.protocol</groupId>
+           <artifactId>ProtocolLib</artifactId>
+           <version>4.7.0</version>
+           <scope>provided</scope>
+       </dependency>
+   </dependencies>
 </project>
